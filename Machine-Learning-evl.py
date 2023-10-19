@@ -2,10 +2,10 @@ import cv2
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
+from Models.ML.LogisticRegression import logisticRegression
 
+import torch
+from tqdm import tqdm
 
 # 加载原图和掩码图
 image_path = "./Resorce/images/img10.jpg"
@@ -17,7 +17,7 @@ mask = cv2.imread(mask_path)
 X = image.reshape(-1, 3)
 # 通过掩码图中的像素值判断该像素是否属于目标类别
 y = np.array([[0 for i in range(mask.shape[1])] for j in range(mask.shape[0])])
-for i in range(mask.shape[0]):
+for i in tqdm(range(mask.shape[0])):
     for j in range(mask.shape[1]):
         if mask[i][j][0] == 0 and mask[i][j][1] == 0 and mask[i][j][2] == 128:
             y[i][j] = 1
@@ -28,11 +28,18 @@ y = y.flatten()
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # 创建逻辑回归模型
-lr = nn.Sequential(
-    nn.Linear(X_train.shape[1], 1),
-    nn.Sigmoid()
-)
-lr.load_state_dict(torch.load('lr.pth'))
+lr = logisticRegression(3, 1)
+
+state_dict = torch.load('./Results/Machine-Learning-rezults/lr.pth')
+new_state_dict = {}
+for key in state_dict.keys():
+    if key == '0.weight':
+        new_state_dict['linear.weight'] = state_dict[key]
+    elif key == '0.bias':
+        new_state_dict['linear.bias'] = state_dict[key]
+    else:
+        new_state_dict[key] = state_dict[key]
+lr.load_state_dict(new_state_dict)
 
 # 在GPU上验证模型
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -49,7 +56,7 @@ mask_pred_lr[np.where(mask_pred_lr < 0.3)] = 0
 
 mask_pred_lr = np.uint8(mask_pred_lr * 255) # 将预测结果转换为0-255的灰度图
 
-cv2.imwrite("img10_pred.jpg", mask_pred_lr) # 将预测结果保存为图片
+cv2.imwrite("./Results/Machine-Learning-rezults/LR_img10_pred.jpg", mask_pred_lr) # 将预测结果保存为图片
 
 mask_pred_lr = cv2.cvtColor(mask_pred_lr, cv2.COLOR_GRAY2BGR) # 将灰度图转换为三通道图像
 
@@ -58,5 +65,6 @@ mask_pred_lr[np.where((mask_pred_lr == [255, 255, 255]).all(axis=2))] = [0, 0, 2
 result_lr = cv2.addWeighted(image, 0.5, mask_pred_lr, 0.5, 0) # 将原图和预测结果融合
 
 cv2.imshow("Logistic Regression", result_lr) # 显示融合后的图像
+cv2.imwrite("./Results/Machine-Learning-rezults/LR_img10_result.jpg", result_lr) # 将融合后的图像保存为图片
 cv2.waitKey(0)
 cv2.destroyAllWindows()

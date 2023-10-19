@@ -1,6 +1,4 @@
-import torch
 import torch.nn as nn
-import torch.optim as optim
 
 class logisticRegression(nn.Module):
     def __init__(self, input_dim, output_dim):

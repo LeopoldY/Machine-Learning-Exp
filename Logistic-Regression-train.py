@@ -1,6 +1,6 @@
-import os
 import numpy as np
 import cv2
+
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
@@ -8,7 +8,6 @@ from Models.ML.LogisticRegression import logisticRegression
 from Models.ML.LogisticRegression import lr_loss_fn
 
 import torch
-import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 
@@ -51,7 +50,7 @@ y_train_torch = y_train_torch.to(device)
 X_test_torch = X_test_torch.to(device)
 
 # 使用tqdm库创建进度条，并在每个迭代步骤中更新进度条
-num_epochs = 10
+num_epochs = 2
 batch_size = 32
 n_batches = len(X_train) // batch_size
 for epoch in range(num_epochs):
@@ -69,7 +68,7 @@ for epoch in range(num_epochs):
     train_loss /= n_batches
     print('Epoch [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, train_loss))
 
-torch.save(lr.state_dict(), 'lr.pth') # 保存模型参数
+torch.save(lr.state_dict(), './Results/Machine-Learning-rezults/lr.pth') # 保存模型参数
 
 # 在GPU上测试模型
 y_test_pred_lr = lr(X_test_torch).squeeze().cpu().detach().numpy()
@@ -79,25 +78,3 @@ print("Test set performance:")
 print("Logistic Regression - Accuracy: {:.3f}, Precision: {:.3f}, Recall: {:.3f}, F1 Score: {:.3f}".format(
     accuracy_score(y_test, y_test_pred_lr), precision_score(y_test, y_test_pred_lr),
     recall_score(y_test, y_test_pred_lr), f1_score(y_test, y_test_pred_lr)))
-
-# 可视化分割结果
-redMask = np.array([[[0, 0, 255] for i in range(mask.shape[1])] for j in range(mask.shape[0])])
-X_torch = torch.from_numpy(X).float().to(device)
-mask_pred_lr = lr(X_torch).squeeze().cpu().detach().numpy().reshape(image.shape[0], image.shape[1])   # 将预测结果转换为二维数组
-
-mask_pred_lr = np.uint8(mask_pred_lr * 255) # 将预测结果转换为0-255的灰度图
-
-mask_pred_lr = cv2.cvtColor(mask_pred_lr, cv2.COLOR_GRAY2BGR) # 将灰度图转换为三通道图像
-
-# mask_pred_lr[np.where((mask_pred_lr == [255, 255, 255]).all(axis=2))] = [0, 0, 255] # 将预测结果中的目标类别像素标记为红色
-for i in range(mask_pred_lr.shape[0]):
-    for j in range(mask_pred_lr.shape[1]):
-        if mask_pred_lr[i][j][0] == 255 and mask_pred_lr[i][j][1] == 255 and mask_pred_lr[i][j][2] == 255:
-            mask_pred_lr[i][j] = [0, 0, 255]
-
-cv2.imwrite("img10_pred.jpg", mask_pred_lr)
-
-result_lr = cv2.addWeighted(image, 0.5, mask_pred_lr, 0.5, 0) # 将原图和预测结果融合
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
