@@ -16,14 +16,8 @@ mask = cv2.imread(mask_path)
 # 将原图和掩码图转换为一维数组
 X = image.reshape(-1, 3)
 # 通过掩码图中的像素值判断该像素是否属于目标类别
-y = np.array([[0 for i in range(mask.shape[1])] for j in range(mask.shape[0])])
-for i in tqdm(range(mask.shape[0])):
-    for j in range(mask.shape[1]):
-        if mask[i][j][0] == 0 and mask[i][j][1] == 0 and mask[i][j][2] == 128:
-            y[i][j] = 1
-        else:
-            y[i][j] = 0
-y = y.flatten()
+mask_red = np.all(mask == [0, 0, 128], axis=2)
+y = mask_red.astype(int).flatten()
 # 将数据集分为训练集和测试集
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 

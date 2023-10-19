@@ -21,6 +21,7 @@ mask = cv2.imread(mask_path)
 X = image.reshape(-1, 3)
 # y = np.any(mask == [0, 0, 128], axis=-1).flatten() # 通过掩码图中的像素值判断该像素是否属于目标类别
 y = np.array([[0 for i in range(mask.shape[1])] for j in range(mask.shape[0])])
+
 for i in range(mask.shape[0]):
     for j in range(mask.shape[1]):
         if mask[i][j][0] == 0 and mask[i][j][1] == 0 and mask[i][j][2] == 128:
