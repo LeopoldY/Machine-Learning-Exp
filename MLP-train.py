@@ -1,14 +1,16 @@
-import numpy as np
+# 使用多层感知机训练
 import cv2
+import numpy as np
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-
-from Models.ML.LogisticRegression import logisticRegression
-from Models.ML.LogisticRegression import lr_loss_fn
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
 import torch
 import torch.optim as optim
+
+from Models.ML.MLP import MLP
+from Models.ML.MLP import mlp_loss_fn
+
 from tqdm import tqdm
 
 # 加载原图和掩码图
@@ -32,13 +34,13 @@ X_train_torch = torch.from_numpy(X_train).float()
 y_train_torch = torch.from_numpy(y_train).float()
 X_test_torch = torch.from_numpy(X_test).float()
 
-# 创建逻辑回归模型
-lr = logisticRegression(3, 1)
-lr_optimizer = optim.Adam(lr.parameters()) # Adam优化器
+# 创建多层感知机模型
+mlp = MLP(3, 1)
+mlp_optimizer = optim.Adam(mlp.parameters()) # Adam优化器
 
 # 在GPU上训练模型
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-lr.to(device)
+mlp.to(device)
 
 # 将数据移动到GPU上
 X_train_torch = X_train_torch.to(device)
@@ -46,32 +48,31 @@ y_train_torch = y_train_torch.to(device)
 X_test_torch = X_test_torch.to(device)
 
 # 使用tqdm库创建进度条，并在每个迭代步骤中更新进度条
-num_epochs = 2
+
+num_epochs = 10
 batch_size = 32
 n_batches = len(X_train) // batch_size
+
 for epoch in range(num_epochs):
-    lr.train() 
+    mlp.train() 
     train_loss = 0.0
     for i in tqdm(range(n_batches)):
         X_batch = X_train_torch[i * batch_size:(i + 1) * batch_size]
         y_batch = y_train_torch[i * batch_size:(i + 1) * batch_size]
-        lr_optimizer.zero_grad()
-        y_pred = lr(X_batch).squeeze()
-        loss = lr_loss_fn(y_pred, y_batch)
+        mlp_optimizer.zero_grad()
+        y_pred = mlp(X_batch).squeeze()
+        loss = mlp_loss_fn(y_pred, y_batch)
         loss.backward()
-        lr_optimizer.step()
+        mlp_optimizer.step()
         train_loss += loss.item()
-    train_loss /= n_batches
-    print('Epoch [{}/{}], Loss: {:.4f}'.format(epoch+1, num_epochs, train_loss))
+    print("Epoch: {} Train loss: {}".format(epoch + 1, train_loss / n_batches))
 
-torch.save(lr.state_dict(), './Results/Machine-Learning-rezults/lr.pth') # 保存模型参数
-
-# 在GPU上测试模型
-lr.eval()
-y_test_pred_lr = lr(X_test_torch).squeeze().cpu().detach().numpy()
-y_test_pred_lr = (y_test_pred_lr > 0.5).astype(int) # 将预测结果转换为0或1
+# 在测试集上评估模型
+mlp.eval()
+y_test_pred_mlp = mlp(X_test_torch).squeeze().cpu().detach().numpy()
+y_test_pred_mlp = (y_test_pred_mlp >= 0.5).astype(int)
 
 print("Test set performance:")
-print("Logistic Regression - Accuracy: {:.3f}, Precision: {:.3f}, Recall: {:.3f}, F1 Score: {:.3f}".format(
-    accuracy_score(y_test, y_test_pred_lr), precision_score(y_test, y_test_pred_lr),
-    recall_score(y_test, y_test_pred_lr), f1_score(y_test, y_test_pred_lr)))
+print("Multi-layer Perceptron - Accuracy: {:.3f}, Precision: {:.3f}, Recall: {:.3f}, F1 Score: {:.3f}".format(
+    accuracy_score(y_test, y_test_pred_mlp), precision_score(y_test, y_test_pred_mlp),
+    recall_score(y_test, y_test_pred_mlp), f1_score(y_test, y_test_pred_mlp)))
