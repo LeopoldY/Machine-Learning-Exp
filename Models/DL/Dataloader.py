@@ -18,8 +18,8 @@ class SegDataset(Dataset):
                 # 去掉换行符，得到图片路径
                 line = line.rstrip()
                 words = line.split()
-                imgs.append((os.path.join(root, "OgData", words[0] + '.jpg'), 
-                             os.path.join(root, "Lable",  words[0] + '.png'))
+                imgs.append((os.path.join(root, "TrainImg", words[0] + '.jpg'), 
+                             os.path.join(root, "Label",  words[0] + '.png'))
                              )
         self.imgs = imgs
 

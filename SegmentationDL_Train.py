@@ -16,15 +16,15 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
-parser.add_argument('--batch_size', type=int, default=256, help='training batch size')
+parser.add_argument('--batch_size', type=int, default=32, help='training batch size')
 parser.add_argument('--epochs', type=int, default=10, help='number of epochs to train')
-parser.add_argument('--device', type = str, default="cuda", help='using CUDA for training')
+parser.add_argument('--device', type = str, default="cuda", required=True, help='use cuda or other device during training')
 
 args = parser.parse_args()
 if args.device == "cuda" and torch.cuda.is_available():
     torch.backends.cudnn.benchmark = True # 启用CuDNN的自动调整功能，以提高深度神经网络的训练性能
     device = torch.device('cuda')
-elif args.device == "mps": # Apple Metal Performance Shaders 使用
+elif args.device == "mps": # Apple Metal Performance Shaders 
     device = torch.device('mps')
 else: # CPU
     device = torch.device('cpu')
@@ -41,7 +41,7 @@ def train():
 
     net = ConvolutionNet()
 
-    print(f'training on {torch.cuda.get_device_name(0)}')
+    print(f'training on {device}')
     net.to(device=device)
     
     optimizer = torch.optim.Adam(net.parameters(), lr=0.01, weight_decay=1e-3)
@@ -62,7 +62,7 @@ def train():
             loss = loss_func(out, batch_y.float())
             train_loss += loss.item()
             pred = (out > 0.5).float() 
-            train_correct = (pred == batch_y).sum() / (128 * 128)
+            train_correct = (pred == batch_y).sum() / (256 * 256)
             train_acc += train_correct.item()
             print('epoch: %2d/%d batch %3d/%d  Train Loss: %.3f, Acc: %.3f'
                     % (epoch + 1, args.epochs, batch, math.ceil(len(trainData) / args.batch_size),
@@ -93,7 +93,7 @@ def train():
             eval_loss += loss.item()
             pred = (out > 0.5).float()
             y_pred.extend(pred.cpu().numpy().flatten())
-            num_correct = (pred == batch_y).sum() / (128 * 128)
+            num_correct = (pred == batch_y).sum() / (256 * 256)
             eval_acc += num_correct.item()
         print('Val Loss: %.6f, Acc: %.3f' % (eval_loss / (math.ceil(len(testData)/args.batch_size)),
                                                 eval_acc / (len(testData))))
