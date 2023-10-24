@@ -1,6 +1,5 @@
 import math
 
-import numpy as np
 from sklearn.metrics import f1_score, precision_score, recall_score
 from Models.DL.Net import ConvolutionNet
 from Models.DL.Dataloader import shuffle_split 
@@ -25,7 +24,7 @@ args = parser.parse_args()
 if args.device == "cuda" and torch.cuda.is_available():
     torch.backends.cudnn.benchmark = True # 启用CuDNN的自动调整功能，以提高深度神经网络的训练性能
     device = torch.device('cuda')
-elif args.device == "mps": # Apple Metal Performance Shaders
+elif args.device == "mps": # Apple Metal Performance Shaders 使用
     device = torch.device('mps')
 else: # CPU
     device = torch.device('cpu')
