@@ -21,13 +21,16 @@ def main():
     parser.add_argument("--output_dir", default="./Resorce/maskPic", help="output dataset directory")
     parser.add_argument("--labels", default="./Resorce/label.txt", help="labels file")
     args = parser.parse_args()
-    args.noviz = False
+    args.noviz = True
 
     if not osp.exists(args.output_dir):
         os.makedirs(args.output_dir)
-    os.makedirs(osp.join(args.output_dir, "JPEGImages"))
-    os.makedirs(osp.join(args.output_dir, "SegmentationClass"))
-    os.makedirs(osp.join(args.output_dir, "SegmentationClassPNG"))
+    if not osp.exists(osp.join(args.output_dir, "JPEGImages")):
+        os.makedirs(osp.join(args.output_dir, "JPEGImages"))
+    if not osp.exists(osp.join(args.output_dir, "SegmentationClass")):
+        os.makedirs(osp.join(args.output_dir, "SegmentationClass"))
+    if not osp.exists(osp.join(args.output_dir, "SegmentationClassPNG")):
+        os.makedirs(osp.join(args.output_dir, "SegmentationClassPNG"))
     # 创建目录
     if not args.noviz:
         os.makedirs(

@@ -7,8 +7,8 @@ from Models.ML.MLP import MLP
 import torch
 
 # 加载原图和掩码图
-image_path = "./Resorce/images/img10.jpg"
-mask_path = "./Resorce/maskPic/SegmentationClassPNG/img10.png"
+image_path = "./Resorce/images/img44.jpg"
+mask_path = "./Resorce/maskPic/SegmentationClassPNG/img44.png"
 image = cv2.imread(image_path)
 mask = cv2.imread(mask_path)
 
@@ -44,20 +44,20 @@ X_torch = torch.from_numpy(X).float().to(device)
 mask_pred_mlp = mlp(X_torch).squeeze().cpu().detach().numpy().reshape(image.shape[0], image.shape[1])   # 将预测结果转换为二维数组
 
 # 二值化处理
-mask_pred_mlp[np.where(mask_pred_mlp >= 0.3)] = 1
-mask_pred_mlp[np.where(mask_pred_mlp < 0.3)] = 0
+mask_pred_mlp[np.where(mask_pred_mlp >= 0.5)] = 1
+mask_pred_mlp[np.where(mask_pred_mlp < 0.5)] = 0
 
 mask_pred_mlp = np.uint8(mask_pred_mlp * 255) # 将预测结果转换为0-255的灰度图
 
-cv2.imwrite("./Results/Machine-Learning-rezults/MLP_img10_pred.jpg", mask_pred_mlp) # 将预测结果保存为图片
+cv2.imwrite("./Results/Machine-Learning-rezults/MLP_img44_pred.jpg", mask_pred_mlp) # 将预测结果保存为图片
 
 mask_pred_mlp = cv2.cvtColor(mask_pred_mlp, cv2.COLOR_GRAY2BGR) # 将灰度图转换为三通道图像
 
 mask_pred_mlp[np.where((mask_pred_mlp == [255, 255, 255]).all(axis=2))] = [0, 0, 255] # 将预测结果中的目标类别像素标记为红色
 
-result_lr = cv2.addWeighted(image, 0.5, mask_pred_mlp, 0.5, 0) # 将原图和预测结果融合
+result_SVM = cv2.addWeighted(image, 0.5, mask_pred_mlp, 0.5, 0) # 将原图和预测结果融合
 
-cv2.imshow("Multi-layer Perceptron", result_lr) # 显示融合后的图像
-cv2.imwrite("./Results/Machine-Learning-rezults/MLP_img10_result.jpg", result_lr) # 将融合后的图像保存为图片
+cv2.imshow("Multi-layer Perceptron", result_SVM) # 显示融合后的图像
+cv2.imwrite("./Results/Machine-Learning-rezults/MLP_img44_result.jpg", result_SVM) # 将融合后的图像保存为图片
 cv2.waitKey(0)
 cv2.destroyAllWindows()
