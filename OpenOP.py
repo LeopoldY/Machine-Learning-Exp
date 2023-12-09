@@ -5,7 +5,7 @@ import skimage.morphology
 import skimage.measure
 
 # 读取掩码图
-mask = skimage.io.imread('output\\dl\\prediction.png')
+mask = skimage.io.imread('PATH/TO/MASK')
 
 # 将掩码图转换为二值图，红色区域为1，黑色区域为0
 mask = mask[:,:,0] > 0

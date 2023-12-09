@@ -19,10 +19,10 @@ def split_image(imgPath, save_path, splitPixel, savePattern='.jpg'):
 
 if __name__ == "__main__":
     splitPixel = 128
-    ogPath = './Resorce/maskPic/JPEGImages'
-    OGsavePath = './Resorce/TrainDataSet/TrainImg'
-    maskPath = './Resorce/maskPic/SegmentationClassPNG'
-    maskSavePath = './Resorce/TrainDataSet/Label'
+    ogPath = 'PATH/TO/ORIGINAL_IMAGE'
+    OGsavePath = 'PATH/TO/SAVE_ORIGINAL_IMAGE'
+    maskPath = 'PATH/TO/MASK_IMAGE'
+    maskSavePath = 'PATH/TO/SAVE_MASK_IMAGE'
     # 清空OGsavePath和maskSavePath
     for root, dirs, files in os.walk(OGsavePath):
         for file in files:
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     print('Done!')
     
     # 读取掩码图
-    maskPath = './Resorce/TrainDataSet/Label'
+    maskPath = maskSavePath
     maskList = os.listdir(maskPath)
     # 删除红色像素量少于10%的掩码图和对应的原图
     for mask in maskList:
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         maskImg[maskImg > 0] = 1
         if np.sum(maskImg) / (maskImg.shape[0] * maskImg.shape[1]) < 0.05:
             os.remove(os.path.join(maskPath, mask))
-            os.remove(os.path.join('./Resorce/TrainDataSet/TrainImg/', mask.strip('.png') + '.jpg'))
+            os.remove(os.path.join(OGsavePath, mask.strip('.png') + '.jpg'))
             print(f"remove {mask}")
 
     #将分割后的文件名写入txt文件

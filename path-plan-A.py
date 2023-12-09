@@ -138,6 +138,12 @@ class AStarPlanner:
 
 
     def calc_final_path(self, goal_node, closed_set):
+        '''
+        计算最终路径
+        :param goal_node: 目标节点
+        :param closed_set: 已探索节点集合
+        :return: 最终路径
+        '''
         # generate final course
         rx, ry = [self.calc_grid_position(goal_node.x, self.min_x)], [
             self.calc_grid_position(goal_node.y, self.min_y)]
@@ -152,6 +158,12 @@ class AStarPlanner:
 
     @staticmethod
     def calc_heuristic(n1, n2):
+        '''
+        计算启发式代价
+        :param n1: 节点1
+        :param n2: 节点2
+        :return: 启发式代价
+        '''
         w = 1.0  # weight of heuristic
         d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
         return d
@@ -259,7 +271,7 @@ def main():
 
     # set obstacle positions
     # 障碍物及边框
-    small_birdseye = cv2.imread('img_bev.jpg')
+    small_birdseye = cv2.imread('PATH/TO/BEV_IMAGE')
     grid = np.zeros((small_birdseye.shape[0], small_birdseye.shape[1]), dtype=np.uint8) # 创建一个与图像大小相同的二维数组
     white_lower = np.array([200, 200, 200], dtype=np.uint8)  # 白色下界
     white_upper = np.array([255, 255, 255], dtype=np.uint8)  # 白色上界

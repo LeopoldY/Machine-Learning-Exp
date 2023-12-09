@@ -7,8 +7,8 @@ from sklearn.metrics import roc_curve, auc
 from sklearn.neural_network import MLPClassifier
 
 # 加载原图和掩码图
-image_path = "./Resorce/images/img10.jpg"
-mask_path = "./Resorce/maskPic/SegmentationClassPNG/img10.png"
+image_path = "PATH/TO/IMAGE"
+mask_path = "PATH/TO/MASK"
 image = cv2.imread(image_path)
 mask = cv2.imread(mask_path)
 

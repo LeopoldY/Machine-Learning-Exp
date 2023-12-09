@@ -7,12 +7,12 @@ from Models.DL.Net import USegNet, SimpleCNN
 
 use_cuda = True
 model = SimpleCNN() #ConvolutionNet()
-model.load_state_dict(torch.load('./output/dl/SCNN_params_final.pth'))
+model.load_state_dict(torch.load('PATH/TO/MODEL'))
 model.eval()
 if use_cuda and torch.cuda.is_available():
     model.cuda()
 
-img = cv2.imread('./Resorce/pics/44.jpg')
+img = cv2.imread('PATH/TO/IMAGE')
 img_tensor = transforms.ToTensor()(img)
 img_tensor = img_tensor.unsqueeze(0) 
 if use_cuda and torch.cuda.is_available():

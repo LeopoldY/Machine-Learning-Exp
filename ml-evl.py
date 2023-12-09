@@ -11,7 +11,7 @@ clsfModel = 'mlp' # 'lr', 'svm', 'mlp
 assert clsfModel in ['lr', 'svm', 'mlp'] #"clsfModel must be one of ['lr', 'svm', 'mlp']"
 
 # 加载原图和掩码图
-image_path = "./Resorce/images/img44.jpg"
+image_path = "PATH/TO/IMAGE"
 image = cv2.imread(image_path)
 
 # 将原图和掩码图转换为一维数组
