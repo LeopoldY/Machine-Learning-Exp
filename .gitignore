@@ -6,3 +6,11 @@
 /Models/ML/__pycache__
 /output
 Models/DL/__pycache__/Dataloader.cpython-38.pyc
+dl-CNN-train-log.txt
+dl-SCNN-train-log.txt
+img_bev.jpg
+mask_processed.png
+ml-train-log.txt
+.vscode/launch.json
+Models/DL/__pycache__/Dataloader.cpython-38.pyc
+Models/DL/__pycache__/Net.cpython-38.pyc

@@ -1,9 +1,10 @@
 import cv2
 import numpy as np
+import time
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.metrics import roc_curve, auc
-from sklearn.neural_network import MLPClassifier
+from sklearn.linear_model import LogisticRegression
 
 # 加载原图和掩码图
 image_path = "./Resorce/images/img10.jpg"
@@ -25,6 +26,7 @@ np.random.shuffle(index)
 X = X[index]
 y = y[index]
 
+
 # 将数据集分为训练集和测试集
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -36,8 +38,11 @@ print("正例数量：", positive_num)
 print("反例数量：", negative_num)
 
 # 训练模型
-clf = MLPClassifier(verbose=True, max_iter=55)
+starttime = time.time()
+clf = LogisticRegression()
 clf.fit(X_train, y_train)
+endtime = time.time()
+print("训练用时：", endtime - starttime)
 
 # 预测
 y_pred = clf.predict(X_test)
@@ -50,7 +55,7 @@ print("F1值：", f1_score(y_test, y_pred))
 
 # 保存模型
 import pickle
-with open("./output/ml/mlp_model.pkl", "wb") as f:
+with open("./output/ml/lr_model.pkl", "wb") as f:
     pickle.dump(clf, f)
 
 # 计算ROC曲线

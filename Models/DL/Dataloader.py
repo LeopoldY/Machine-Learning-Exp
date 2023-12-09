@@ -39,6 +39,13 @@ class SegDataset(Dataset):
         return len(self.imgs)
 
 def shuffle_split(listFile, trainFile, valFile):
+    '''
+    将数据集随机分为训练集和验证集
+    '''
+    if os.path.exists(trainFile):
+        os.remove(trainFile)
+    if os.path.exists(valFile):
+        os.remove(valFile)
     with open(listFile, 'r') as f:
         records = f.readlines()
     random.shuffle(records)

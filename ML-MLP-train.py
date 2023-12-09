@@ -1,9 +1,10 @@
 import cv2
 import numpy as np
+import time
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.metrics import roc_curve, auc
-from sklearn.svm import SVC
+from sklearn.neural_network import MLPClassifier
 
 # 加载原图和掩码图
 image_path = "./Resorce/images/img10.jpg"
@@ -17,9 +18,9 @@ X = image.reshape(-1, 3)
 mask_red = np.all(mask == [0, 0, 128], axis=2)
 y = mask_red.astype(int).flatten()
 
-# 随机选取20000条正例和反例数据进行训练
-positive_index = np.random.choice(np.where(y == 1)[0], 20000)
-negative_index = np.random.choice(np.where(y == 0)[0], 20000)
+# 随机选取200000条正例和反例数据进行训练
+positive_index = np.random.choice(np.where(y == 1)[0], 200000)
+negative_index = np.random.choice(np.where(y == 0)[0], 200000)
 index = np.concatenate((positive_index, negative_index))
 np.random.shuffle(index)
 X = X[index]
@@ -27,12 +28,6 @@ y = y[index]
 
 # 将数据集分为训练集和测试集
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-from sklearn.preprocessing import minmax_scale
-
-X_train = minmax_scale(X_train)
-X_test = minmax_scale(X_test)
-
 
 # 正例数量
 positive_num = sum(y_train == 1)
@@ -42,8 +37,11 @@ print("正例数量：", positive_num)
 print("反例数量：", negative_num)
 
 # 训练模型
-clf = SVC(verbose=True, probability=True)
+starttime = time.time()
+clf = MLPClassifier(verbose=False, max_iter=55)
 clf.fit(X_train, y_train)
+endtime = time.time()
+print("训练用时：", endtime - starttime)
 
 # 预测
 y_pred = clf.predict(X_test)
@@ -56,7 +54,7 @@ print("F1值：", f1_score(y_test, y_pred))
 
 # 保存模型
 import pickle
-with open("./output/ml/svm_model.pkl", "wb") as f:
+with open("./output/ml/mlp_model.pkl", "wb") as f:
     pickle.dump(clf, f)
 
 # 计算ROC曲线
